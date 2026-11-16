@@ -48,4 +48,4 @@ from the GIWA faucet, and trade or launch.
 
 ## The name
 
-**Giwajang** (기와장, also written *giwatjang*) is one piece of roof tile — a wide, flat sheet of clay, cement or metal made for covering roofs. GIWA (기와) is the same tile: the chain itself is named after it. The mark in `logo.svg` is three tile channels stacked the way giwa tiles lie on a roof — one tile at a time, and together they cover the house. Every launch on Giwajang is one more tile on the GIWA roof.
+**Giwajang** (기와장, also written *giwatjang*) is one piece of roof tile — a wide, flat sheet of clay, cement or metal made for covering roofs. GIWA (기와) is the same tile: the chain itself is named after it. The mark in `logo.svg` is a *gwimyeon* (귀면) — the demon face carved into traditional Korean roof tile ends to guard the house — drawn on the outline of a single giwajang slab, studded border and all. One tile guards the roof; every launch lays one more. Every launch on Giwajang is one more tile on the GIWA roof.

@@ -38,6 +38,8 @@ header {
 .brand { display: flex; align-items: center; gap: 14px; }
 .logo { font-size: 38px; }
 h1 { margin: 0; font-size: 30px; font-family: Georgia, "Iowan Old Style", "Times New Roman", serif; font-weight: 700; letter-spacing: 0.2px; }
+h1 .hangul { font-size: 19px; color: var(--accent-dark); font-family: ui-sans-serif, system-ui, sans-serif; font-weight: 700; vertical-align: 3px; }
+h2 .kr { font-size: 14px; color: var(--muted); font-family: ui-sans-serif, system-ui, sans-serif; font-weight: 600; margin-left: 8px; letter-spacing: 0.4px; }
 .tagline { margin: 2px 0 0; color: var(--muted); font-size: 13px; }
 
 .head-right { display: flex; align-items: center; gap: 12px; }
