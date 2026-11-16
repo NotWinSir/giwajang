@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Giwajang — GIWA Sepolia Launchpad (Ammora SDK)</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🪨%3C/text%3E%3C/svg%3E" />
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body>
+    <header>
+      <div class="brand">
+        <div class="logo">🪨</div>
+        <div>
+          <h1>Giwajang</h1>
+          <p class="tagline">Launchpad on GIWA Sepolia · powered by the Ammora SDK</p>
+        </div>
+      </div>
+      <div class="head-right">
+        <span class="badge">GIWA Sepolia · 91342</span>
+        <button id="connectBtn">Connect wallet</button>
+      </div>
+    </header>
+
+    <main>
+      <section class="card">
+        <h2>Markets</h2>
+        <p class="hint">Live bonding-curve state read straight from the chain. A market graduates to a
+          migrated pool when its quote reserve reaches the Config threshold.</p>
+        <div id="marketList" class="market-list"><p class="muted">Loading markets…</p></div>
+        <button id="refreshBtn" class="ghost">↻ Refresh</button>
+      </section>
+
+      <section class="card">
+        <h2>Trade</h2>
+        <label>Market
+          <select id="tradeToken"></select>
+        </label>
+        <div class="row">
+          <div class="seg">
+            <button id="dirBuy" class="segbtn active">Buy</button>
+            <button id="dirSell" class="segbtn">Sell</button>
+          </div>
+          <label class="grow">Amount (<span id="amountUnit">WETH</span>)
+            <input id="tradeAmount" type="text" inputmode="decimal" placeholder="0.01" />
+          </label>
+        </div>
+        <div id="quoteBox" class="quote muted">Enter an amount to preview the quote.</div>
+        <div class="row">
+          <button id="quoteBtn" class="ghost">Get quote</button>
+          <button id="tradeBtn">Execute trade</button>
+        </div>
+        <div id="tradeLog" class="log"></div>
+      </section>
+
+      <section class="card">
+        <h2>Launch a token</h2>
+        <p class="hint">Creates your own Config (from the reviewed public template), the token and its
+          bonding curve, plus a first buy — atomically, in one transaction after a single exact WETH approval.
+          All fee/LP/leftover recipients are your connected wallet.</p>
+        <div class="grid2">
+          <label>Token name <input id="lcName" type="text" placeholder="Giwamora" /></label>
+          <label>Symbol <input id="lcSymbol" type="text" placeholder="GMORA" /></label>
+          <label>Sale supply (tokens) <input id="lcSupply" type="text" inputmode="decimal" value="1000000000" /></label>
+          <label>Graduation threshold (WETH) <input id="lcThreshold" type="text" inputmode="decimal" value="0.05" /></label>
+          <label>First buy (WETH) <input id="lcFirstBuy" type="text" inputmode="decimal" value="0.001" /></label>
+          <label>Metadata URI (optional) <input id="lcUri" type="text" placeholder="https://example.com/token.json" /></label>
+        </div>
+        <button id="launchBtn">🚀 Launch token</button>
+        <div id="launchLog" class="log"></div>
+      </section>
+    </main>
+
+    <footer>
+      <p>Testnet demo — GIWA Sepolia assets have no real-world value. Contracts are unaudited beta.
+        Built with <a href="https://www.npmjs.com/package/@ammora-protocol/sdk" target="_blank" rel="noreferrer">@ammora-protocol/sdk 0.3.9</a> ·
+        <a href="https://sepolia-explorer.giwa.io" target="_blank" rel="noreferrer">GIWA Sepolia explorer</a></p>
+    </footer>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
