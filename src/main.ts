@@ -73,10 +73,19 @@ const DEFAULT_LAUNCHES: Launch[] = [
   },
 ];
 
+const ADDR_RE = /^0x[0-9a-fA-F]{40}$/;
+function saneLaunch(x: any): x is Launch {
+  return !!x && typeof x === 'object'
+    && typeof x.token === 'string' && ADDR_RE.test(x.token)
+    && typeof x.curve === 'string' && ADDR_RE.test(x.curve)
+    && typeof x.name === 'string' && typeof x.symbol === 'string';
+}
+
 function loadLaunches(): Launch[] {
   try {
     const raw = localStorage.getItem(STORE_KEY);
-    const extra: Launch[] = raw ? JSON.parse(raw) : [];
+    const parsed = raw ? JSON.parse(raw) : [];
+    const extra: Launch[] = Array.isArray(parsed) ? parsed.filter(saneLaunch) : [];
     const seen = new Set<string>();
     return [...DEFAULT_LAUNCHES, ...extra].filter((l) => {
       const k = l.token.toLowerCase();
@@ -103,6 +112,11 @@ let wallet: any = null;
 let direction: 'buy' | 'sell' = 'buy';
 
 const $ = (id: string) => document.getElementById(id)!;
+// Escape on-chain / stored strings before they go into innerHTML: token
+// names and symbols are attacker-controllable text on a public chain.
+const esc = (s: unknown) => String(s ?? '').replace(/[&<>"']/g, (c) => ({
+  '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
+}[c] as string));
 const short = (a: string) => `${a.slice(0, 6)}…${a.slice(-4)}`;
 const txLink = (h: string) => `<a href="${EXPLORER}/tx/${h}" target="_blank" rel="noreferrer">${short(h)}</a>`;
 const addrLink = (a: string) => `<a href="${EXPLORER}/address/${a}" target="_blank" rel="noreferrer">${short(a)}</a>`;
@@ -152,16 +166,16 @@ async function renderMarkets() {
       let balanceLine = '';
       if (account) {
         const bal = await pub.readContract({ address: l.token, abi: erc20Abi, functionName: 'balanceOf', args: [account] });
-        balanceLine = `<div><b>Your balance</b>${formatUnits(bal, meta.decimals)} ${meta.symbol}</div>`;
+        balanceLine = `<div><b>Your balance</b>${formatUnits(bal, meta.decimals)} ${esc(meta.symbol)}</div>`;
       }
       cards.push(`
         <div class="market">
           <div class="market-head">
-            <div class="market-name">${meta.name} <span>$${meta.symbol}</span></div>
+            <div class="market-name">${esc(meta.name)} <span>$${esc(meta.symbol)}</span></div>
             <div class="status ${!graduated && state.status === 1 ? 'live' : ''}">${status}</div>
           </div>
           <div class="market-meta">
-            <div><b>Price</b>${perMillion.toFixed(8)} WETH / 1M ${meta.symbol}</div>
+            <div><b>Price</b>${perMillion.toFixed(8)} WETH / 1M ${esc(meta.symbol)}</div>
             <div><b>Curve reserve</b>${formatUnits(state.quoteReserve, 18)} WETH</div>
             <div><b>Graduation</b>${progress.toFixed(1)}% of ${formatUnits(state.migrationQuoteThreshold, 18)} WETH
               <div class="progress"><div style="width:${progress}%"></div></div></div>
@@ -172,13 +186,13 @@ async function renderMarkets() {
           </div>
         </div>`);
     } catch (e: any) {
-      cards.push(`<div class="market"><div class="market-name">${l.name} <span>$${l.symbol}</span></div><p class="muted">Could not load curve state: ${e?.shortMessage ?? e?.message ?? e}</p></div>`);
+      cards.push(`<div class="market"><div class="market-name">${esc(l.name)} <span>$${esc(l.symbol)}</span></div><p class="muted">Could not load curve state: ${esc(e?.shortMessage ?? e?.message ?? e)}</p></div>`);
     }
   }
   list.innerHTML = cards.join('');
   const sel = $('tradeToken') as HTMLSelectElement;
   const current = sel.value;
-  sel.innerHTML = launches.map((l) => `<option value="${l.token}">${l.name} ($${l.symbol})</option>`).join('');
+  sel.innerHTML = launches.map((l) => `<option value="${l.token}">${esc(l.name)} ($${esc(l.symbol)})</option>`).join('');
   if (current && launches.some((l) => l.token === current)) sel.value = current;
 }
 
@@ -241,8 +255,8 @@ async function showQuote() {
     const outUnit = direction === 'buy' ? meta.symbol : 'WETH';
     const outDec = direction === 'buy' ? meta.decimals : 18;
     const inDec = direction === 'buy' ? 18 : meta.decimals;
-    const partial = quote.amountLeft > 0n ? ` <b>⚠ partial fill — ${formatUnits(quote.amountLeft, inDec)} ${inUnit} would not fill</b>` : '';
-    box.innerHTML = `You receive ≈ <b>${formatUnits(quote.amountOut, outDec)} ${outUnit}</b> · fee ${formatUnits(quote.fee, inDec)} ${inUnit}${partial}`;
+    const partial = quote.amountLeft > 0n ? ` <b>⚠ partial fill — ${formatUnits(quote.amountLeft, inDec)} ${esc(inUnit)} would not fill</b>` : '';
+    box.innerHTML = `You receive ≈ <b>${formatUnits(quote.amountOut, outDec)} ${esc(outUnit)}</b> · fee ${formatUnits(quote.fee, inDec)} ${esc(inUnit)}${partial}`;
   } catch (e: any) {
     box.textContent = `Quote failed: ${e?.shortMessage ?? e?.message ?? e}`;
   }
@@ -290,7 +304,7 @@ async function executeTrade() {
       abi: ammoraLaunchPoolV4Abi as any, functionName: 'swapExactInput',
       args: [amountIn, minOut, direction === 'sell', false, account, deadline],
     });
-    log(logEl, `Swapping on the ${meta.symbol} curve…`);
+    log(logEl, `Swapping on the ${esc(meta.symbol)} curve…`);
     const hash = await wallet.sendTransaction({ account, chain, to: l.curve, data });
     const receipt = await pub.waitForTransactionReceipt({ hash });
     if (receipt.status !== 'success') throw new Error(`Swap reverted: ${hash}`);
@@ -298,7 +312,7 @@ async function executeTrade() {
     await renderMarkets();
     await showQuote();
   } catch (e: any) {
-    log(logEl, `Error: ${e?.shortMessage ?? e?.message ?? e}`, 'err');
+    log(logEl, `Error: ${esc(e?.shortMessage ?? e?.message ?? e)}`, 'err');
   } finally {
     btn.disabled = false;
   }
@@ -351,6 +365,9 @@ async function executeLaunch() {
     if (!name || !symbol) throw new Error('Token name and symbol are required.');
     const uriInput = ($('lcUri') as HTMLInputElement).value.trim();
     const metadataURI = uriInput || `https://example.com/${symbol.toLowerCase()}.json`;
+    if (!uriInput) {
+      log(logEl, '⚠ Metadata URI is empty — the token will launch with a placeholder example.com URI, and it cannot be changed later. Fill the field and retry if that is not what you want.', 'err');
+    }
 
     log(logEl, 'Reading the reviewed launch template (Config #6)…');
     const templateBlock = await pub.getBlockNumber();
@@ -424,10 +441,10 @@ async function executeLaunch() {
     const entry: Launch = { token, curve: created.curve, name: meta.name, symbol: meta.symbol };
     saveLaunch(entry);
     launches = loadLaunches();
-    log(logEl, `🎉 <b>${meta.name} ($${meta.symbol})</b> is live! Token ${addrLink(token)} · Curve ${addrLink(created.curve)} · tx ${txLink(hash)}`, 'ok');
+    log(logEl, `🎉 <b>${esc(meta.name)} ($${esc(meta.symbol)})</b> is live! Token ${addrLink(token)} · Curve ${addrLink(created.curve)} · tx ${txLink(hash)}`, 'ok');
     await renderMarkets();
   } catch (e: any) {
-    log(logEl, `Error: ${e?.shortMessage ?? e?.message ?? e}`, 'err');
+    log(logEl, `Error: ${esc(e?.shortMessage ?? e?.message ?? e)}`, 'err');
   } finally {
     btn.disabled = false;
   }
@@ -453,5 +470,5 @@ $('tradeBtn').addEventListener('click', () => executeTrade());
 $('launchBtn').addEventListener('click', () => executeLaunch());
 
 renderMarkets().catch((e) => {
-  $('marketList').innerHTML = `<p class="muted">Could not reach the GIWA Sepolia RPC: ${e?.message ?? e}</p>`;
+  $('marketList').innerHTML = `<p class="muted">Could not reach the GIWA Sepolia RPC: ${esc(e?.message ?? e)}</p>`;
 });
