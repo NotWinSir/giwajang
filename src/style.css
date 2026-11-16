@@ -1,13 +1,18 @@
+/* Giwajang — light, board-first theme modelled on the Pons launchpad look:
+   off-white ground, white rounded cards, black serif display headings,
+   one vivid lime-green accent. No external fonts or assets. */
 :root {
-  --bg: #0b0f14;
-  --card: #12181f;
-  --card2: #182029;
-  --line: #26313d;
-  --text: #e8eef4;
-  --muted: #8fa3b3;
-  --accent: #e8b34b;
-  --accent2: #2fbf71;
-  --danger: #e5534b;
+  --bg: #f6f6f1;
+  --card: #ffffff;
+  --card2: #fafaf6;
+  --line: #e2e2d8;
+  --text: #141414;
+  --muted: #6d7268;
+  --accent: #a6e22e;
+  --accent-dark: #7cb518;
+  --accent2: #1d9e57;
+  --danger: #d93a30;
+  --limewash: #f0f8dc;
 }
 
 * { box-sizing: border-box; }
@@ -27,11 +32,12 @@ header {
   padding: 18px 24px;
   border-bottom: 1px solid var(--line);
   flex-wrap: wrap;
+  background: var(--card);
 }
 
 .brand { display: flex; align-items: center; gap: 14px; }
 .logo { font-size: 38px; }
-h1 { margin: 0; font-size: 26px; letter-spacing: 0.3px; }
+h1 { margin: 0; font-size: 30px; font-family: Georgia, "Iowan Old Style", "Times New Roman", serif; font-weight: 700; letter-spacing: 0.2px; }
 .tagline { margin: 2px 0 0; color: var(--muted); font-size: 13px; }
 
 .head-right { display: flex; align-items: center; gap: 12px; }
@@ -41,8 +47,18 @@ h1 { margin: 0; font-size: 26px; letter-spacing: 0.3px; }
   padding: 5px 12px;
   font-size: 12px;
   color: var(--muted);
-  background: var(--card);
+  background: var(--card2);
 }
+.btn-green {
+  background: var(--accent);
+  color: #141414;
+  border-radius: 9px;
+  padding: 10px 18px;
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+}
+.btn-green:hover { background: var(--accent-dark); text-decoration: none; }
 
 main {
   max-width: 880px;
@@ -56,16 +72,30 @@ main {
 .card {
   background: var(--card);
   border: 1px solid var(--line);
-  border-radius: 14px;
-  padding: 20px;
+  border-radius: 16px;
+  padding: 22px;
 }
 
-h2 { margin: 0 0 10px; font-size: 19px; }
+h2 { margin: 0 0 10px; font-size: 26px; font-family: Georgia, "Iowan Old Style", "Times New Roman", serif; font-weight: 700; }
 .hint { color: var(--muted); font-size: 13px; margin: 0 0 14px; line-height: 1.5; }
 .muted { color: var(--muted); }
 
+.tabs { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
+.tab {
+  background: var(--card2);
+  color: var(--muted);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 7px 16px;
+  font-size: 13px;
+  font-weight: 600;
+}
+.tab.active { background: var(--accent); color: #141414; border-color: var(--accent-dark); }
+
 label { display: flex; flex-direction: column; gap: 6px; font-size: 13px; color: var(--muted); }
 label.grow { flex: 1; }
+label.span2 { grid-column: span 2; }
+@media (max-width: 560px) { label.span2 { grid-column: span 1; } }
 
 input, select {
   background: var(--card2);
@@ -76,21 +106,21 @@ input, select {
   font-size: 14px;
   width: 100%;
 }
-input:focus, select:focus { outline: 2px solid var(--accent); outline-offset: 0; border-color: transparent; }
+input:focus, select:focus { outline: 2px solid var(--accent-dark); outline-offset: 0; border-color: transparent; }
 
 button {
   background: var(--accent);
-  color: #1a1405;
+  color: #141414;
   border: 0;
   border-radius: 9px;
   padding: 10px 18px;
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
 }
-button:hover { filter: brightness(1.08); }
+button:hover { filter: brightness(0.97); }
 button:disabled { opacity: 0.45; cursor: not-allowed; }
-button.ghost { background: transparent; color: var(--text); border: 1px solid var(--line); font-weight: 500; }
+button.ghost { background: var(--card); color: var(--text); border: 1px solid var(--line); font-weight: 600; }
 
 .row { display: flex; gap: 12px; align-items: flex-end; margin: 12px 0; flex-wrap: wrap; }
 .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 16px; }
@@ -98,28 +128,28 @@ button.ghost { background: transparent; color: var(--text); border: 1px solid va
 
 .seg { display: flex; border: 1px solid var(--line); border-radius: 9px; overflow: hidden; }
 .segbtn { background: var(--card2); color: var(--muted); border-radius: 0; padding: 10px 22px; }
-.segbtn.active { background: var(--accent2); color: #06130b; }
+.segbtn.active { background: var(--accent2); color: #fff; }
 #dirSell.active { background: var(--danger); color: #fff; }
 
 .market-list { display: flex; flex-direction: column; gap: 12px; margin-bottom: 14px; }
 .market {
   background: var(--card2);
   border: 1px solid var(--line);
-  border-radius: 12px;
+  border-radius: 14px;
   padding: 16px;
 }
 .market-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; flex-wrap: wrap; }
-.market-name { font-size: 17px; font-weight: 700; }
-.market-name span { color: var(--accent); }
-.status { font-size: 12px; padding: 3px 10px; border-radius: 999px; border: 1px solid var(--line); color: var(--muted); }
+.market-name { font-size: 19px; font-weight: 700; font-family: Georgia, "Iowan Old Style", "Times New Roman", serif; }
+.market-name span { color: var(--accent-dark); }
+.status { font-size: 12px; padding: 3px 10px; border-radius: 999px; border: 1px solid var(--line); color: var(--muted); background: var(--card); }
 .status.live { color: var(--accent2); border-color: var(--accent2); }
 .market-meta { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 8px 18px; margin-top: 12px; font-size: 13px; }
 .market-meta b { display: block; color: var(--muted); font-weight: 500; font-size: 11px; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 2px; }
 .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; word-break: break-all; }
-a { color: var(--accent); text-decoration: none; }
+a { color: var(--accent-dark); text-decoration: none; }
 a:hover { text-decoration: underline; }
 
-.progress { height: 9px; background: #0d1218; border-radius: 999px; overflow: hidden; margin-top: 6px; border: 1px solid var(--line); }
+.progress { height: 9px; background: #e9e9df; border-radius: 999px; overflow: hidden; margin-top: 6px; border: 1px solid var(--line); }
 .progress > div { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); }
 
 .quote { background: var(--card2); border: 1px dashed var(--line); border-radius: 9px; padding: 12px 14px; font-size: 14px; line-height: 1.55; }
@@ -128,5 +158,23 @@ a:hover { text-decoration: underline; }
 .log .ok { color: var(--accent2); }
 .log .err { color: var(--danger); }
 .log div { word-break: break-word; }
+
+.step { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.7px; color: var(--text); margin: 16px 0 10px; }
+.step:first-child { margin-top: 0; }
+
+.launch-wrap { display: grid; grid-template-columns: 1fr 260px; gap: 20px; align-items: start; }
+@media (max-width: 700px) { .launch-wrap { grid-template-columns: 1fr; } }
+.preview {
+  background: var(--limewash);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 16px;
+}
+.pv-head { margin: 0 0 10px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.7px; color: var(--muted); font-weight: 700; }
+.pv-name { font-family: Georgia, "Iowan Old Style", "Times New Roman", serif; font-size: 22px; font-weight: 700; }
+.pv-sym { color: var(--accent-dark); font-weight: 700; font-size: 13px; margin: 2px 0 12px; }
+.pv-row { display: flex; justify-content: space-between; gap: 10px; font-size: 13px; padding: 6px 0; border-top: 1px solid var(--line); }
+.pv-row span { color: var(--muted); }
+.pv-note { font-size: 12px; color: var(--muted); line-height: 1.5; margin: 12px 0 0; }
 
 footer { max-width: 880px; margin: 0 auto; padding: 10px 16px 30px; color: var(--muted); font-size: 12.5px; line-height: 1.6; }

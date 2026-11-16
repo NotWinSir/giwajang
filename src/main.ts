@@ -169,7 +169,7 @@ async function renderMarkets() {
         balanceLine = `<div><b>Your balance</b>${formatUnits(bal, meta.decimals)} ${esc(meta.symbol)}</div>`;
       }
       cards.push(`
-        <div class="market">
+        <div class="market" data-status="${graduated ? 'graduated' : state.status === 1 ? 'live' : 'other'}">
           <div class="market-head">
             <div class="market-name">${esc(meta.name)} <span>$${esc(meta.symbol)}</span></div>
             <div class="status ${!graduated && state.status === 1 ? 'live' : ''}">${status}</div>
@@ -186,10 +186,11 @@ async function renderMarkets() {
           </div>
         </div>`);
     } catch (e: any) {
-      cards.push(`<div class="market"><div class="market-name">${esc(l.name)} <span>$${esc(l.symbol)}</span></div><p class="muted">Could not load curve state: ${esc(e?.shortMessage ?? e?.message ?? e)}</p></div>`);
+      cards.push(`<div class="market" data-status="other"><div class="market-name">${esc(l.name)} <span>$${esc(l.symbol)}</span></div><p class="muted">Could not load curve state: ${esc(e?.shortMessage ?? e?.message ?? e)}</p></div>`);
     }
   }
   list.innerHTML = cards.join('');
+  applyTabFilter();
   const sel = $('tradeToken') as HTMLSelectElement;
   const current = sel.value;
   sel.innerHTML = launches.map((l) => `<option value="${l.token}">${esc(l.name)} ($${esc(l.symbol)})</option>`).join('');
@@ -414,6 +415,11 @@ async function executeLaunch() {
     log(logEl, 'Planning the atomic launch (Config + token + first buy)…');
     let plan: any = await planFresh();
     if (plan.status === 'APPROVAL_REQUIRED') {
+      // An ERC-20 approval must never carry native value; if the planner
+      // ever asks for one, treat it as hostile/buggy and stop.
+      if (BigInt(plan.transaction.value ?? 0n) !== 0n) {
+        throw new Error('Approval plan unexpectedly carries a native value — aborting.');
+      }
       log(logEl, 'Sending the exact WETH approval to the launch helper…');
       const h = await wallet.sendTransaction({
         account, chain, to: plan.transaction.to, data: plan.transaction.data,
@@ -460,7 +466,40 @@ function setDirection(d: 'buy' | 'sell') {
   $('quoteBox').textContent = 'Enter an amount to preview the quote.';
 }
 
+// ---------------- Board tabs + launch preview ----------------
+
+let marketTab: 'all' | 'live' | 'graduated' = 'all';
+function applyTabFilter() {
+  document.querySelectorAll<HTMLElement>('#marketList .market').forEach((el) => {
+    el.style.display = marketTab === 'all' || el.dataset.status === marketTab ? '' : 'none';
+  });
+  for (const [id, tab] of [['tabAll', 'all'], ['tabLive', 'live'], ['tabGrad', 'graduated']] as const) {
+    $(id).classList.toggle('active', marketTab === tab);
+  }
+}
+function setTab(tab: 'all' | 'live' | 'graduated') { marketTab = tab; applyTabFilter(); }
+
+function updatePreview() {
+  const name = ($('lcName') as HTMLInputElement).value.trim();
+  const symbol = ($('lcSymbol') as HTMLInputElement).value.trim();
+  const supply = ($('lcSupply') as HTMLInputElement).value.trim();
+  const threshold = ($('lcThreshold') as HTMLInputElement).value.trim();
+  const firstBuy = ($('lcFirstBuy') as HTMLInputElement).value.trim();
+  $('pvName').textContent = name || 'Your token';
+  $('pvSymbol').textContent = (symbol || 'TICKER').toUpperCase();
+  $('pvSupply').textContent = supply || '—';
+  $('pvThreshold').textContent = threshold || '—';
+  $('pvFirstBuy').textContent = firstBuy || '—';
+}
+
 $('connectBtn').addEventListener('click', () => connect().catch((e) => alert(e?.message ?? e)));
+$('tabAll').addEventListener('click', () => setTab('all'));
+$('tabLive').addEventListener('click', () => setTab('live'));
+$('tabGrad').addEventListener('click', () => setTab('graduated'));
+for (const id of ['lcName', 'lcSymbol', 'lcSupply', 'lcThreshold', 'lcFirstBuy']) {
+  $(id).addEventListener('input', updatePreview);
+}
+updatePreview();
 $('refreshBtn').addEventListener('click', () => renderMarkets());
 $('dirBuy').addEventListener('click', () => setDirection('buy'));
 $('dirSell').addEventListener('click', () => setDirection('sell'));

@@ -18,15 +18,21 @@
       </div>
       <div class="head-right">
         <span class="badge">GIWA Sepolia · 91342</span>
+        <a class="btn-green" href="#launch">Launch a token</a>
         <button id="connectBtn">Connect wallet</button>
       </div>
     </header>
 
     <main>
       <section class="card">
-        <h2>Markets</h2>
+        <h2>Explore launches</h2>
         <p class="hint">Live bonding-curve state read straight from the chain. A market graduates to a
           migrated pool when its quote reserve reaches the Config threshold.</p>
+        <div class="tabs">
+          <button id="tabAll" class="tab active">All</button>
+          <button id="tabLive" class="tab">Live on curve</button>
+          <button id="tabGrad" class="tab">Graduated</button>
+        </div>
         <div id="marketList" class="market-list"><p class="muted">Loading markets…</p></div>
         <button id="refreshBtn" class="ghost">↻ Refresh</button>
       </section>
@@ -53,21 +59,38 @@
         <div id="tradeLog" class="log"></div>
       </section>
 
-      <section class="card">
+      <section class="card" id="launch">
         <h2>Launch a token</h2>
-        <p class="hint">Creates your own Config (from the reviewed public template), the token and its
+        <p class="hint">Two steps. Creates your own Config (from the reviewed public template), the token and its
           bonding curve, plus a first buy — atomically, in one transaction after a single exact WETH approval.
           All fee/LP/leftover recipients are your connected wallet.</p>
-        <div class="grid2">
-          <label>Token name <input id="lcName" type="text" placeholder="Giwamora" /></label>
-          <label>Symbol <input id="lcSymbol" type="text" placeholder="GMORA" /></label>
-          <label>Sale supply (tokens) <input id="lcSupply" type="text" inputmode="decimal" value="1000000000" /></label>
-          <label>Graduation threshold (WETH) <input id="lcThreshold" type="text" inputmode="decimal" value="0.05" /></label>
-          <label>First buy (WETH) <input id="lcFirstBuy" type="text" inputmode="decimal" value="0.001" /></label>
-          <label>Metadata URI (optional) <input id="lcUri" type="text" placeholder="https://example.com/token.json" /></label>
+        <div class="launch-wrap">
+          <div class="launch-form">
+            <p class="step">1 · Identity — give it a name and a face</p>
+            <div class="grid2">
+              <label>Token name <input id="lcName" type="text" placeholder="Giwamora" /></label>
+              <label>Symbol <input id="lcSymbol" type="text" placeholder="GMORA" /></label>
+              <label class="span2">Metadata URI (optional) <input id="lcUri" type="text" placeholder="https://example.com/token.json" /></label>
+            </div>
+            <p class="step">2 · Economics — the curve opens the moment you sign</p>
+            <div class="grid2">
+              <label>Sale supply (tokens) <input id="lcSupply" type="text" inputmode="decimal" value="1000000000" /></label>
+              <label>Graduation threshold (WETH) <input id="lcThreshold" type="text" inputmode="decimal" value="0.05" /></label>
+              <label>First buy (WETH) <input id="lcFirstBuy" type="text" inputmode="decimal" value="0.001" /></label>
+            </div>
+            <button id="launchBtn">🚀 Launch token</button>
+            <div id="launchLog" class="log"></div>
+          </div>
+          <aside class="preview">
+            <p class="pv-head">On the board · preview</p>
+            <div class="pv-name" id="pvName">Your token</div>
+            <div class="pv-sym">$<span id="pvSymbol">TICKER</span> · WETH pair</div>
+            <div class="pv-row"><span>Supply</span><b id="pvSupply">1,000,000,000</b></div>
+            <div class="pv-row"><span>Graduates at</span><b><span id="pvThreshold">0.05</span> WETH</b></div>
+            <div class="pv-row"><span>First buy</span><b><span id="pvFirstBuy">0.001</span> WETH</b></div>
+            <p class="pv-note">Non-custodial: every step is a transaction your own wallet signs.</p>
+          </aside>
         </div>
-        <button id="launchBtn">🚀 Launch token</button>
-        <div id="launchLog" class="log"></div>
       </section>
     </main>
 
