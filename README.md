@@ -45,3 +45,7 @@ from the GIWA faucet, and trade or launch.
 - `dev/` holds the browser-verification harness used during development
   (headless Chrome + a TLS relay that works around this sandbox's egress
   proxy). It is not part of the app.
+
+## The name
+
+**Giwajang** (기와장, also written *giwatjang*) is one piece of roof tile — a wide, flat sheet of clay, cement or metal made for covering roofs. GIWA (기와) is the same tile: the chain itself is named after it. The mark in `logo.svg` is three tile channels stacked the way giwa tiles lie on a roof — one tile at a time, and together they cover the house. Every launch on Giwajang is one more tile on the GIWA roof.
